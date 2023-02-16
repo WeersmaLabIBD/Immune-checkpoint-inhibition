@@ -1,0 +1,51 @@
+---
+title: "Logistic GAMs"
+output: html_notebook
+author: Johannes Bjork
+---
+
+```{r load packages}
+require(tidyverse)
+require(patchwork)
+require(mgcv)
+```
+
+## Logistic GAMs on diet scores from both centres
+
+```{r load example data}
+diet_scores <- readRDS("~/diet_scores_both_centres.rds")
+```
+
+```{r HGAMs on diet scores}
+m_pfs12=gam(PFS12 ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+
+m_orr=gam(ORR ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+
+m_iraes=gam(irAEs ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+```
+
+```{inspect model results}
+summary(m_pfs12)
+summary(m_orr)
+summary(irAEs)
+```
+
+```{r plot}
+# ORR
+plot(m_orr, scale=F, trans=plogis, select=1, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # aMED
+plot(m_orr, scale=F, trans=plogis, select=2, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_orr, scale=F, trans=plogis, select=3, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_orr, scale=F, trans=plogis, select=4, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # uPDI
+
+# PFS12
+plot(m_pfs12, scale=F, trans=plogis, select=1, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # aMED
+plot(m_pfs12, scale=F, trans=plogis, select=2, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_pfs12, scale=F, trans=plogis, select=3, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_pfs12, scale=F, trans=plogis, select=4, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # uPDI
+
+# irAEs
+plot(m_iraes, scale=F, trans=plogis, select=1, shift=coef(m_iraes)[1], shade=T, seWithMean=T, se=T) # aMED
+plot(m_iraes, scale=F, trans=plogis, select=2, shift=coef(m_iraes)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_iraes, scale=F, trans=plogis, select=3, shift=coef(m_iraes)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_iraes, scale=F, trans=plogis, select=4, shift=coef(m_iraes)[1], shade=T, seWithMean=T, se=T) # uPDI
+```
