@@ -1,0 +1,139 @@
+---
+title: "Logistic GAMs - Figure 1 & e5"
+output: html_notebook
+author: Johannes Bjork
+---
+
+```{r load packages}
+require(tidyverse)
+require(patchwork)
+require(mgcv)
+```
+
+## Logistic GAMs on diet scores from both centres
+
+```{r load data}
+# Includes diet scores and the variables centre, age, sex and BMI
+diet_scores <- readRDS("~/Documents/UMGC/diet/submitting/JAMA/diet_scores_both_centres.rds")
+```
+
+```{r HGAMs on diet scores}
+m_pfs12=gam(PFS12 ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+
+m_orr=gam(ORR ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+
+m_tox=gam(toxicity ~ s(aMED, k=5) + s(OriginalPDI,k=5) + s(hPDI,k=5) + s(uPDI,k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5) + s(centre,bs="re"), data=diet_scores, select=T, family=binomial, method="REML")
+```
+
+```{inspect model results}
+summary(m_pfs12)
+summary(m_orr)
+summary(m_tox)
+```
+
+```{r plot}
+# ORR
+plot(m_orr, scale=F, trans=plogis, select=1, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # aMED (Figure 1)
+plot(m_orr, scale=F, trans=plogis, select=2, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_orr, scale=F, trans=plogis, select=3, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_orr, scale=F, trans=plogis, select=4, shift=coef(m_orr)[1], shade=T, seWithMean=T, se=T) # uPDI
+
+# PFS12
+plot(m_pfs12, scale=F, trans=plogis, select=1, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # aMED
+plot(m_pfs12, scale=F, trans=plogis, select=2, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_pfs12, scale=F, trans=plogis, select=3, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_pfs12, scale=F, trans=plogis, select=4, shift=coef(m_pfs12)[1], shade=T, seWithMean=T, se=T) # uPDI
+
+# Toxicity
+plot(m_tox, scale=F, trans=plogis, select=1, shift=coef(m_tox)[1], shade=T, seWithMean=T, se=T) # aMED
+plot(m_tox, scale=F, trans=plogis, select=2, shift=coef(m_tox)[1], shade=T, seWithMean=T, se=T) # Original PDI
+plot(m_tox, scale=F, trans=plogis, select=3, shift=coef(m_tox)[1], shade=T, seWithMean=T, se=T) # hPDI
+plot(m_tox, scale=F, trans=plogis, select=4, shift=coef(m_tox)[1], shade=T, seWithMean=T, se=T) # uPDI
+```
+
+## Logistic GAMs on PCA scores on each centre seperately
+
+```{r load data}
+dat_uk <- readRDS("~/Documents/UMGC/diet/submitting/JAMA/dat_uk.rds")
+dat_nl <- readRDS("~/Documents/UMGC/diet/submitting/JAMA/dat_nl.rds")
+```
+
+```{r HGAMs on PCA scores: UK}
+m_pfs12_pc_uk=gam(PFS12 ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_uk, select=T, family=binomial, method="REML")
+
+m_orr_pc_uk=gam(ORR ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_uk, select=T, family=binomial, method="REML")
+
+m_tox_pc_uk=gam(toxicity ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_uk, select=T, family=binomial, method="REML")
+```
+
+```{inspect model results}
+summary(m_pfs12_pc_uk)
+summary(m_orr_pc_uk)
+summary(m_tox_pc_uk)
+```
+
+```{r plot}
+# ORR
+plot(m_orr_pc_uk, scale=F, trans=plogis, select=1, shift=coef(m_orr_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC1
+plot(m_orr_pc_uk, scale=F, trans=plogis, select=2, shift=coef(m_orr_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC2
+plot(m_orr_pc_uk, scale=F, trans=plogis, select=3, shift=coef(m_orr_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_orr_pc_uk, scale=F, trans=plogis, select=4, shift=coef(m_orr_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_orr_pc_uk, scale=F, trans=plogis, select=5, shift=coef(m_orr_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC5
+
+# PFS12
+plot(m_pfs12_pc_uk, scale=F, trans=plogis, select=1, shift=coef(m_pfs12_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC1
+plot(m_pfs12_pc_uk, scale=F, trans=plogis, select=2, shift=coef(m_pfs12_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC2 (Figure e5A)
+plot(m_pfs12_pc_uk, scale=F, trans=plogis, select=3, shift=coef(m_pfs12_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_pfs12_pc_uk, scale=F, trans=plogis, select=4, shift=coef(m_pfs12_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_pfs12_pc_uk, scale=F, trans=plogis, select=5, shift=coef(m_pfs12_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC5
+
+# Toxicity
+plot(m_tox_pc_uk, scale=F, trans=plogis, select=1, shift=coef(m_tox_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC1
+plot(m_tox_pc_uk, scale=F, trans=plogis, select=2, shift=coef(m_tox_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC2 
+plot(m_tox_pc_uk, scale=F, trans=plogis, select=3, shift=coef(m_tox_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_tox_pc_uk, scale=F, trans=plogis, select=4, shift=coef(m_tox_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_tox_pc_uk, scale=F, trans=plogis, select=5, shift=coef(m_tox_pc_uk)[1], shade=T, seWithMean=T, se=T) # PC4
+```
+
+```{r HGAMs on PCA scores: nl}
+m_pfs12_pc_nl=gam(PFS12 ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_nl, select=T, family=binomial, method="REML")
+
+m_orr_pc_nl=gam(ORR ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_nl, select=T, family=binomial, method="REML")
+
+m_tox_pc_nl=gam(toxicity ~ s(PC1, k=5) + s(PC2, k=5) + s(PC3, k=5) + s(PC4, k=5) + s(PC5, k=5) + s(sex,bs="re") + s(bmi,k=5) + s(age,k=5), data=dat_nl, select=T, family=binomial, method="REML")
+```
+
+```{inspect model results}
+summary(m_pfs12_pc_nl)
+summary(m_orr_pc_nl)
+summary(m_tox_pc_nl)
+```
+
+```{r plot}
+# ORR
+plot(m_orr_pc_nl, scale=F, trans=plogis, select=1, shift=coef(m_orr_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC1 (Figure e5B)
+plot(m_orr_pc_nl, scale=F, trans=plogis, select=2, shift=coef(m_orr_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC2
+plot(m_orr_pc_nl, scale=F, trans=plogis, select=3, shift=coef(m_orr_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_orr_pc_nl, scale=F, trans=plogis, select=4, shift=coef(m_orr_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_orr_pc_nl, scale=F, trans=plogis, select=5, shift=coef(m_orr_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC5
+
+# PFS12
+plot(m_pfs12_pc_nl, scale=F, trans=plogis, select=1, shift=coef(m_pfs12_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC1 
+plot(m_pfs12_pc_nl, scale=F, trans=plogis, select=2, shift=coef(m_pfs12_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC2
+plot(m_pfs12_pc_nl, scale=F, trans=plogis, select=3, shift=coef(m_pfs12_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_pfs12_pc_nl, scale=F, trans=plogis, select=4, shift=coef(m_pfs12_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_pfs12_pc_nl, scale=F, trans=plogis, select=5, shift=coef(m_pfs12_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC5
+
+# Toxicity
+plot(m_tox_pc_nl, scale=F, trans=plogis, select=1, shift=coef(m_tox_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC1
+plot(m_tox_pc_nl, scale=F, trans=plogis, select=2, shift=coef(m_tox_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC2
+plot(m_tox_pc_nl, scale=F, trans=plogis, select=3, shift=coef(m_tox_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC3
+plot(m_tox_pc_nl, scale=F, trans=plogis, select=4, shift=coef(m_tox_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC4
+plot(m_tox_pc_nl, scale=F, trans=plogis, select=4, shift=coef(m_tox_pc_nl)[1], shade=T, seWithMean=T, se=T) # PC5
+```
+
+
+
+
+
+
